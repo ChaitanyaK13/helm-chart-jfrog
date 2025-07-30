@@ -25,7 +25,7 @@ jobs:
 
       - name: Configure JFrog CLI
         run: |
-          ./jfrog config add my-server \
+          jf config add my-server \
             --url=https://trialix4me9.jfrog.io \
             --user=${{ secrets.HELM_CHARTS_REGISTRY_USERNAME }} \
             --password=${{ secrets.HELM_CHARTS_REGISTRY_PASSWORD }} \
@@ -37,4 +37,4 @@ jobs:
 
       - name: Upload to JFrog Artifactory
         run: |
-          ./jfrog rt upload "sample-app-*.tgz" "testhelm-helm-local/sample-app/" --server-id=my-server
+          jf rt upload "sample-app-*.tgz" "testhelm-helm-local/sample-app/" --server-id=my-server
