@@ -1,0 +1,40 @@
+name: helm-upload
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up job
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '3.13.1'
+
+      - name: Install JFrog CLI
+        run: |
+          curl -fL https://install-cli.jfrog.io | sh
+          mkdir -p ~/.jfrog
+
+      - name: Configure JFrog CLI
+        run: |
+          ./jfrog config add my-server \
+            --url=https://trialix4me9.jfrog.io \
+            --user=${{ secrets.HELM_CHARTS_REGISTRY_USERNAME }} \
+            --password=${{ secrets.HELM_CHARTS_REGISTRY_PASSWORD }} \
+            --interactive=false
+
+      - name: Package Helm Chart
+        run: |
+          helm package ./sample-app
+
+      - name: Upload to JFrog Artifactory
+        run: |
+          ./jfrog rt upload "sample-app-*.tgz" "testhelm-helm-local/sample-app/" --server-id=my-server
